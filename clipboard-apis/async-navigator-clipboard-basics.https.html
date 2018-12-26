@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Async Clipboard basic tests</title>
+<title>Async Clipboard input type validation tests</title>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
 <script>
@@ -46,6 +46,21 @@ promise_test(function(t) {
                          navigator.clipboard.writeText());
 }, "navigator.clipboard.writeText() fails (expect DOMString)");
 
+/* clipboard.writeImage_POC() */
+
+promise_test(async () => {
+  const fetched = await fetch(
+        'http://localhost:8001/clipboard-apis/resources/greenbox.png');
+  const image = await fetched.blob();
+
+  return navigator.clipboard.writeImage_POC(image);
+}, "navigator.clipboard.writeImage_POC(Blob) succeeds");
+
+promise_test(t => {
+  return promise_rejects(t, new TypeError(),
+                         navigator.clipboard.writeImage_POC());
+}, "navigator.clipboard.writeImage_POC() fails (expect Blob)");
+
 
 /* clipboard.read() */
 
@@ -65,5 +80,14 @@ promise_test(function() {
       assert_equals(typeof result, "string");
     });
 }, "navigator.clipboard.readText() succeeds");
+
+/* clipboard.readImage_POC() */
+
+promise_test(() => {
+  return navigator.clipboard.readImage_POC()
+    .then(result => {
+      assert_equals(typeof result, "object");
+    });
+}, "navigator.clipboard.readImage_POC() succeeds");
 
 </script>
